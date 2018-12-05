@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+echo "-- Start installing --"
+
+# Install OpenCart
+php $INSTALL_DIR/install/cli_install.php install --db_hostname $MYSQL_HOST --db_username $MYSQL_USER --db_password $MYSQL_PASSWORD --db_database $MYSQL_DATABASE --db_driver $DB_DRIVER --db_port $DB_PORT --username $ADMIN_USERNAME --password $ADMIN_PASSWORD --email $ADMIN_EMAIL --http_server $BASE_URI
+
+echo "-- Remove install directory --"
+# Remove install directory
+rm -rf $INSTALL_DIR/install
+
+#echo "-- Install becopay modual --"
+# Install becopay module
+#php $INSTALL_DIR/bin/console prestashop:module install becopay
+
+echo "-- Change files owner --"
+# Change owner files
+chown -R www-data:www-data $INSTALL_DIR
+
+echo "-- Change storage path --"
+mv $INSTALL_DIR/system/storage /var/www
+sed -i "s#DIR_SYSTEM . 'storage/'#'/var/www/storage/'#g" $INSTALL_DIR/config.php
+sed -i "s#DIR_SYSTEM . 'storage/'#'/var/www/storage/'#g" $INSTALL_DIR/admin/config.php
+
+echo "-- Finish installing --"
